@@ -7,4 +7,8 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SingleTasker.Common\SingleTasker.Common.csproj" />
+  </ItemGroup>
+
 </Project>
