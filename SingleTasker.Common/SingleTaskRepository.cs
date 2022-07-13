@@ -96,13 +96,8 @@ public class SingleTaskRepository
         await writer.WriteAsync(
             @"# SingleTasker todo
 
-- Load from a file
-- Display task on screen
-- Checkbox on task
-- back/forward buttons
-- sections
-- save task list wherever
-- reload task list on edit
-- save task list on checked");
+- Check the box to complete a task
+- Use Up and Down arrows to move through task list
+- Click the pencil to edit the task list using your favorite editor");
     }
 }

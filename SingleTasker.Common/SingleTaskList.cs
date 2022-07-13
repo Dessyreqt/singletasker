@@ -6,36 +6,23 @@ public class SingleTaskList
 {
     public SingleTaskList()
     {
-        Title = string.Empty;
-        Items = new List<SingleTask>();
+        Sections = new List<SingleTaskListSection>();
     }
 
-    public List<SingleTask> Items { get; }
-
-    public string Title { get; set; }
-
-    public int GetFirstIncompleteTask()
-    {
-        var firstIncompleteTask = Items.FirstOrDefault(item => !item.Complete);
-
-        if (firstIncompleteTask is null)
-        {
-            return -1;
-        }
-
-        return Items.IndexOf(firstIncompleteTask);
-    }
+    public List<SingleTaskListSection> Sections { get; }
 
     public override string ToString()
     {
         StringBuilder builder = new();
 
-        builder.AppendLine($"# {Title}");
-        builder.AppendLine();
-
-        foreach (var item in Items)
+        foreach (var section in Sections)
         {
-            builder.AppendLine(item.ToString());
+            if (builder.Length > 0)
+            {
+                builder.AppendLine();
+            }
+
+            builder.AppendLine(section.ToString());
         }
 
         return builder.ToString();

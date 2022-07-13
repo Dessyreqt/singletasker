@@ -7,6 +7,7 @@ public class SingleTaskListParser
     public SingleTaskList Parse(string rawList)
     {
         SingleTaskList taskList = new();
+        SingleTaskListSection currentTaskListSection = null;
 
         foreach (var line in rawList.Split(Environment.NewLine))
         {
@@ -14,28 +15,37 @@ public class SingleTaskListParser
 
             if (trimmedLine.StartsWith("#"))
             {
-                if (taskList.Title == string.Empty)
+                if (currentTaskListSection is not null)
                 {
-                    taskList.Title = line.TrimStart('#').Trim();
+                    taskList.Sections.Add(currentTaskListSection);
                 }
-                else
-                {
-                    return taskList;
-                }
+
+                currentTaskListSection = new SingleTaskListSection { Title = line.TrimStart('#').Trim() };
+                continue;
+            }
+
+            if (currentTaskListSection is null)
+            {
+                continue;
             }
 
             if (trimmedLine.StartsWith(completedTaskStart))
             {
                 var description = trimmedLine.Remove(0, completedTaskStart.Length).Trim();
 
-                taskList.Items.Add(new SingleTask(description, true));
+                currentTaskListSection.Items.Add(new SingleTask(description, true));
             }
             else if (trimmedLine.StartsWith("-"))
             {
                 var description = trimmedLine.TrimStart('-').Trim();
 
-                taskList.Items.Add(new SingleTask(description));
+                currentTaskListSection.Items.Add(new SingleTask(description));
             }
+        }
+
+        if (currentTaskListSection is not null)
+        {
+            taskList.Sections.Add(currentTaskListSection);
         }
 
         return taskList;

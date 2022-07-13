@@ -25,6 +25,7 @@ public partial class MainWindow : Window
     private readonly SingleTaskRepository _repo;
     private int _currentTaskIndex;
     private SingleTaskList _taskList;
+    private SingleTaskListSection _currentTaskListSection;
     private SingleTask _currentTask;
 
     public MainWindow()
@@ -42,6 +43,7 @@ public partial class MainWindow : Window
     private async Task LoadTaskList()
     {
         _taskList = await _repo.GetTaskList();
+        _currentTaskListSection = _taskList.Sections.First();
         NextIncompleteTask();
     }
 
@@ -55,10 +57,10 @@ public partial class MainWindow : Window
     {
         if (_currentTaskIndex == -1)
         {
-            _currentTaskIndex = _taskList.GetFirstIncompleteTask();
+            _currentTaskIndex = _currentTaskListSection.GetFirstIncompleteTask();
         }
 
-        _currentTask = _taskList.Items[_currentTaskIndex];
+        _currentTask = _currentTaskListSection.Items[_currentTaskIndex];
     }
 
     private void UpButton_Click(object sender, RoutedEventArgs e)
@@ -84,7 +86,7 @@ public partial class MainWindow : Window
 
     private void NextTask()
     {
-        if (_currentTaskIndex < _taskList.Items.Count - 1)
+        if (_currentTaskIndex < _currentTaskListSection.Items.Count - 1)
         {
             _currentTaskIndex++;
         }
