@@ -12,27 +12,6 @@ public class SingleTaskRepository
         _path = path;
     }
 
-    private async Task<FileStream> WaitForFile(string fullPath, FileMode mode, FileAccess access, FileShare share)
-    {
-        for (int numTries = 0; numTries < 10; numTries++)
-        {
-            FileStream fs = null;
-            try
-            {
-                fs = new FileStream(fullPath, mode, access, share);
-                return fs;
-            }
-            catch (IOException)
-            {
-                fs?.Dispose();
-
-                await Task.Delay(50);
-            }
-        }
-
-        return null;
-    }
-
     public FileSystemWatcher Watcher { get; private set; }
 
     public async Task Initialize()
@@ -75,6 +54,30 @@ public class SingleTaskRepository
         await writer.WriteAsync(taskList.ToString());
     }
 
+    private async Task<FileStream> WaitForFile(string fullPath, FileMode mode, FileAccess access, FileShare share)
+    {
+        for (int numTries = 0; numTries < 10; numTries++)
+        {
+            FileStream fs = null;
+            try
+            {
+                fs = new FileStream(fullPath, mode, access, share);
+                return fs;
+            }
+            catch (IOException)
+            {
+                if (fs is not null)
+                {
+                    await fs.DisposeAsync();
+                }
+
+                await Task.Delay(50);
+            }
+        }
+
+        return null;
+    }
+
     private async Task CreatePathIfNeeded()
     {
         _directory = Path.GetDirectoryName(_path);
@@ -102,6 +105,4 @@ public class SingleTaskRepository
 - reload task list on edit
 - save task list on checked");
     }
-
-
 }

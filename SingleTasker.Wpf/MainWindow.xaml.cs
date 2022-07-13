@@ -47,7 +47,7 @@ public partial class MainWindow : Window
 
     private void DisplayCurrentTask()
     {
-        TaskDescriptionLabel.Content = _currentTask.Description;
+        TaskDescriptionLabel.Text = _currentTask.Description;
         TaskCompleteCheckbox.IsChecked = _currentTask.Complete;
     }
 
