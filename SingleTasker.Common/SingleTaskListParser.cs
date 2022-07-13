@@ -2,6 +2,8 @@
 
 public class SingleTaskListParser
 {
+    private const string completedTaskStart = "- [x]";
+
     public SingleTaskList Parse(string rawList)
     {
         SingleTaskList taskList = new();
@@ -22,7 +24,13 @@ public class SingleTaskListParser
                 }
             }
 
-            if (trimmedLine.StartsWith("-"))
+            if (trimmedLine.StartsWith(completedTaskStart))
+            {
+                var description = trimmedLine.Remove(0, completedTaskStart.Length).Trim();
+
+                taskList.Items.Add(new SingleTask(description, true));
+            }
+            else if (trimmedLine.StartsWith("-"))
             {
                 var description = trimmedLine.TrimStart('-').Trim();
 

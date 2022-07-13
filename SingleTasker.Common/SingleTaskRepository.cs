@@ -1,5 +1,7 @@
 ﻿namespace SingleTasker.Common;
 
+using System.Diagnostics;
+
 public class SingleTaskRepository
 {
     private readonly string _path;
@@ -21,7 +23,8 @@ public class SingleTaskRepository
         if (!File.Exists(_path))
         {
             using var writer = new StreamWriter(_path, false);
-            writer.Write(@"# SingleTasker todo
+            writer.Write(
+                @"# SingleTasker todo
 
 - Load from a file
 - Display task on screen
@@ -39,6 +42,18 @@ public class SingleTaskRepository
         CreatePathIfNeeded();
         using var reader = new StreamReader(_path);
         return new SingleTaskListParser().Parse(reader.ReadToEnd());
+    }
+
+    public void OpenFile()
+    {
+        var startInfo = new ProcessStartInfo { FileName = _path, UseShellExecute = true };
+        Process.Start(startInfo);
+    }
+
+    public void SaveTaskList(SingleTaskList taskList)
+    {
+        using var writer = new StreamWriter(_path, false);
+        writer.Write(taskList.ToString());
     }
 }
 

@@ -22,13 +22,88 @@ using Path = System.IO.Path;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private SingleTaskRepository _repo;
+    private readonly SingleTaskRepository _repo;
+    private int _currentTaskIndex;
+    private SingleTaskList _taskList;
+    private SingleTask _currentTask;
 
     public MainWindow()
     {
         InitializeComponent();
         var storagePath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "SingleTasker", "tasks.md");
         _repo = new SingleTaskRepository(storagePath);
-        var taskList = _repo.GetTaskList();
+        _taskList = _repo.GetTaskList();
+        NextIncompleteTask();
+    }
+
+    private void DisplayCurrentTask()
+    {
+        TaskDescriptionLabel.Content = _currentTask.Description;
+        TaskCompleteCheckbox.IsChecked = _currentTask.Complete;
+    }
+
+    private void SetCurrentTask()
+    {
+        if (_currentTaskIndex == -1)
+        {
+            _currentTaskIndex = _taskList.GetFirstIncompleteTask();
+        }
+
+        _currentTask = _taskList.Items[_currentTaskIndex];
+    }
+
+    private void UpButton_Click(object sender, RoutedEventArgs e)
+    {
+        PreviousTask();
+    }
+
+    private void DownButton_Click(object sender, RoutedEventArgs e)
+    {
+        NextTask();
+    }
+
+    private void PreviousTask()
+    {
+        if (_currentTaskIndex > 0)
+        {
+            _currentTaskIndex--;
+        }
+
+        SetCurrentTask();
+        DisplayCurrentTask();
+    }
+
+    private void NextTask()
+    {
+        if (_currentTaskIndex < _taskList.Items.Count - 1)
+        {
+            _currentTaskIndex++;
+        }
+
+        SetCurrentTask();
+        DisplayCurrentTask();
+    }
+
+    private void NextIncompleteTask()
+    {
+        _currentTaskIndex = -1;
+        SetCurrentTask();
+        DisplayCurrentTask();
+    }
+
+    private void EditButton_Click(object sender, RoutedEventArgs e)
+    {
+        _repo.OpenFile();
+    }
+
+    private void TaskCompleteCheckbox_Click(object sender, RoutedEventArgs e)
+    {
+        _currentTask.Complete = TaskCompleteCheckbox.IsChecked ?? false;
+        _repo.SaveTaskList(_taskList);
+
+        if (_currentTask.Complete)
+        {
+            NextTask();
+        }
     }
 }
