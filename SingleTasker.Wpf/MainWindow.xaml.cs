@@ -32,7 +32,16 @@ public partial class MainWindow : Window
         InitializeComponent();
         var storagePath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "SingleTasker", "tasks.md");
         _repo = new SingleTaskRepository(storagePath);
-        _taskList = _repo.GetTaskList();
+    }
+
+    private async void TaskListChanged(object sender, FileSystemEventArgs e)
+    {
+        await Dispatcher.InvokeAsync(LoadTaskList);
+    }
+
+    private async Task LoadTaskList()
+    {
+        _taskList = await _repo.GetTaskList();
         NextIncompleteTask();
     }
 
@@ -96,14 +105,21 @@ public partial class MainWindow : Window
         _repo.OpenFile();
     }
 
-    private void TaskCompleteCheckbox_Click(object sender, RoutedEventArgs e)
+    private async void TaskCompleteCheckbox_Click(object sender, RoutedEventArgs e)
     {
         _currentTask.Complete = TaskCompleteCheckbox.IsChecked ?? false;
-        _repo.SaveTaskList(_taskList);
+        await _repo.SaveTaskList(_taskList);
 
         if (_currentTask.Complete)
         {
             NextTask();
         }
+    }
+
+    private async void Window_Loaded(object sender, RoutedEventArgs e)
+    {
+        await _repo.Initialize();
+        _repo.Watcher.Changed += TaskListChanged;
+        await LoadTaskList();
     }
 }

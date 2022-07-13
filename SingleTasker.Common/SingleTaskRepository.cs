@@ -5,26 +5,93 @@ using System.Diagnostics;
 public class SingleTaskRepository
 {
     private readonly string _path;
+    private string _directory;
 
     public SingleTaskRepository(string path)
     {
         _path = path;
     }
 
-    public void CreatePathIfNeeded()
+    private async Task<FileStream> WaitForFile(string fullPath, FileMode mode, FileAccess access, FileShare share)
     {
-        var directory = Path.GetDirectoryName(_path);
-
-        if (!Directory.Exists(directory))
+        for (int numTries = 0; numTries < 10; numTries++)
         {
-            Directory.CreateDirectory(directory);
+            FileStream fs = null;
+            try
+            {
+                fs = new FileStream(fullPath, mode, access, share);
+                return fs;
+            }
+            catch (IOException)
+            {
+                fs?.Dispose();
+
+                await Task.Delay(50);
+            }
         }
 
-        if (!File.Exists(_path))
+        return null;
+    }
+
+    public FileSystemWatcher Watcher { get; private set; }
+
+    public async Task Initialize()
+    {
+        await CreatePathIfNeeded();
+
+        var filename = Path.GetFileName(_path);
+
+        Watcher = new FileSystemWatcher(_directory);
+        Watcher.NotifyFilter = NotifyFilters.Attributes
+                               | NotifyFilters.CreationTime
+                               | NotifyFilters.DirectoryName
+                               | NotifyFilters.FileName
+                               | NotifyFilters.LastAccess
+                               | NotifyFilters.LastWrite
+                               | NotifyFilters.Security
+                               | NotifyFilters.Size;
+        Watcher.Filter = filename;
+        Watcher.IncludeSubdirectories = false;
+        Watcher.EnableRaisingEvents = true;
+    }
+
+    public async Task<SingleTaskList> GetTaskList()
+    {
+        await CreatePathIfNeeded();
+        var fileStream = await WaitForFile(_path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        using var reader = new StreamReader(fileStream);
+        return new SingleTaskListParser().Parse(await reader.ReadToEndAsync());
+    }
+
+    public void OpenFile()
+    {
+        var startInfo = new ProcessStartInfo { FileName = _path, UseShellExecute = true };
+        Process.Start(startInfo);
+    }
+
+    public async Task SaveTaskList(SingleTaskList taskList)
+    {
+        await using var writer = new StreamWriter(_path, false);
+        await writer.WriteAsync(taskList.ToString());
+    }
+
+    private async Task CreatePathIfNeeded()
+    {
+        _directory = Path.GetDirectoryName(_path);
+
+        if (!Directory.Exists(_directory))
         {
-            using var writer = new StreamWriter(_path, false);
-            writer.Write(
-                @"# SingleTasker todo
+            Directory.CreateDirectory(_directory);
+        }
+
+        if (File.Exists(_path))
+        {
+            return;
+        }
+
+        await using var writer = new StreamWriter(_path, false);
+        await writer.WriteAsync(
+            @"# SingleTasker todo
 
 - Load from a file
 - Display task on screen
@@ -34,39 +101,7 @@ public class SingleTaskRepository
 - save task list wherever
 - reload task list on edit
 - save task list on checked");
-        }
     }
 
-    public SingleTaskList GetTaskList()
-    {
-        CreatePathIfNeeded();
-        using var reader = new StreamReader(_path);
-        return new SingleTaskListParser().Parse(reader.ReadToEnd());
-    }
 
-    public void OpenFile()
-    {
-        var startInfo = new ProcessStartInfo { FileName = _path, UseShellExecute = true };
-        Process.Start(startInfo);
-    }
-
-    public void SaveTaskList(SingleTaskList taskList)
-    {
-        using var writer = new StreamWriter(_path, false);
-        writer.Write(taskList.ToString());
-    }
 }
-
-/*
-# SingleTasker todo
-
-- Load from a file
-- Display task on screen
-- Checkbox on task
-- back/forward buttons
-- sections
-- save task list wherever
-- reload task list on edit
-- save task list on checked
-
- */
