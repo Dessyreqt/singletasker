@@ -1,4 +1,4 @@
-﻿namespace SingleTasker;
+﻿namespace SingleTasker.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Configuration;

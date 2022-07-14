@@ -1,21 +1,11 @@
-﻿namespace SingleTasker;
+﻿namespace SingleTasker.Wpf;
+
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using SingleTasker.Common;
-using Path = System.IO.Path;
+using SingleTasker.Wpf.Common;
 
 /// <summary>
 /// Interaction logic for MainWindow.xaml
@@ -44,7 +34,7 @@ public partial class MainWindow : Window
     {
         _taskList = await _repo.GetTaskList();
         _currentTaskListSection = _taskList.Sections.First();
-        NextIncompleteTask();
+        await NextIncompleteTask();
     }
 
     private void DisplayCurrentTask()
@@ -53,8 +43,15 @@ public partial class MainWindow : Window
         TaskCompleteCheckbox.IsChecked = _currentTask.Complete;
     }
 
-    private void SetCurrentTask()
+    private async Task SetCurrentTask()
     {
+        if (_currentTaskListSection.Items.Count == 0)
+        {
+            _currentTaskListSection.Items.Add(new SingleTask("Add more things to do"));
+            _currentTaskIndex = 0;
+            await _repo.SaveTaskList(_taskList);
+        }
+
         if (_currentTaskIndex == -1)
         {
             _currentTaskIndex = _currentTaskListSection.GetFirstIncompleteTask();
@@ -63,42 +60,42 @@ public partial class MainWindow : Window
         _currentTask = _currentTaskListSection.Items[_currentTaskIndex];
     }
 
-    private void UpButton_Click(object sender, RoutedEventArgs e)
+    private async void UpButton_Click(object sender, RoutedEventArgs e)
     {
-        PreviousTask();
+        await PreviousTask();
     }
 
-    private void DownButton_Click(object sender, RoutedEventArgs e)
+    private async void DownButton_Click(object sender, RoutedEventArgs e)
     {
-        NextTask();
+        await NextTask();
     }
 
-    private void PreviousTask()
+    private async Task PreviousTask()
     {
         if (_currentTaskIndex > 0)
         {
             _currentTaskIndex--;
         }
 
-        SetCurrentTask();
+        await SetCurrentTask();
         DisplayCurrentTask();
     }
 
-    private void NextTask()
+    private async Task NextTask()
     {
         if (_currentTaskIndex < _currentTaskListSection.Items.Count - 1)
         {
             _currentTaskIndex++;
         }
 
-        SetCurrentTask();
+        await SetCurrentTask();
         DisplayCurrentTask();
     }
 
-    private void NextIncompleteTask()
+    private async Task NextIncompleteTask()
     {
         _currentTaskIndex = -1;
-        SetCurrentTask();
+        await SetCurrentTask();
         DisplayCurrentTask();
     }
 
@@ -114,7 +111,7 @@ public partial class MainWindow : Window
 
         if (_currentTask.Complete)
         {
-            NextTask();
+            await NextTask();
         }
     }
 

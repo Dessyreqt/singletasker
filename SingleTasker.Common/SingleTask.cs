@@ -1,4 +1,4 @@
-﻿namespace SingleTasker.Common;
+﻿namespace SingleTasker.Wpf.Common;
 
 public class SingleTask
 {
