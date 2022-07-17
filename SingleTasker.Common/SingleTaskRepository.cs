@@ -5,14 +5,14 @@ using System.Diagnostics;
 public class SingleTaskRepository
 {
     private readonly string _path;
-    private string _directory;
+    private string? _directory;
 
     public SingleTaskRepository(string path)
     {
         _path = path;
     }
 
-    public FileSystemWatcher Watcher { get; private set; }
+    public FileSystemWatcher? Watcher { get; private set; }
 
     public async Task Initialize()
     {
@@ -34,12 +34,19 @@ public class SingleTaskRepository
         Watcher.EnableRaisingEvents = true;
     }
 
-    public async Task<SingleTaskList> GetTaskList()
+    public async Task<SingleTaskList?> GetTaskList(SingleTaskList? currentTaskList)
     {
         await CreatePathIfNeeded();
         var fileStream = await WaitForFile(_path, FileMode.Open, FileAccess.Read, FileShare.Read);
         using var reader = new StreamReader(fileStream);
-        return new SingleTaskListParser().Parse(await reader.ReadToEndAsync());
+        var readTaskList = await reader.ReadToEndAsync();
+
+        if (readTaskList != currentTaskList?.ToString())
+        {
+            return new SingleTaskListParser().Parse(readTaskList);
+        }
+
+        return null;
     }
 
     public void OpenFile()

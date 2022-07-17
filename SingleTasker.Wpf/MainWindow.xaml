@@ -11,7 +11,8 @@
         MinHeight="135"
         MinWidth="180"
         Topmost="True" 
-        WindowStyle="None" 
+        WindowStyle="None"
+        AllowsTransparency="True"
         Loaded="Window_Loaded" 
         MouseDown="Window_MouseDown">
     <Grid>

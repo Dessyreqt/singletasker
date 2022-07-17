@@ -34,7 +34,14 @@ public partial class MainWindow : Window
 
     private async Task LoadTaskList(int selectedSectionIndex = -1)
     {
-        _taskList = await _repo.GetTaskList();
+        var readTaskList = await _repo.GetTaskList(_taskList);
+
+        if (readTaskList == null)
+        {
+            return;
+        }
+
+        _taskList = readTaskList ?? _taskList;
         SectionsComboBox.Items.Clear();
         _taskList.Sections.ForEach(x => SectionsComboBox.Items.Add(x.Title));
 

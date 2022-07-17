@@ -7,7 +7,7 @@ public class SingleTaskListParser
     public SingleTaskList Parse(string rawList)
     {
         SingleTaskList taskList = new();
-        SingleTaskListSection currentTaskListSection = null;
+        SingleTaskListSection? currentTaskListSection = null;
 
         foreach (var line in rawList.Split(Environment.NewLine))
         {
