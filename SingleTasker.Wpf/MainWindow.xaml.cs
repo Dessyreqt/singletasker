@@ -130,4 +130,14 @@ public partial class MainWindow : Window
             DragMove();
         }
     }
+
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    {
+        Environment.Exit(0);
+    }
+
+    private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
 }
