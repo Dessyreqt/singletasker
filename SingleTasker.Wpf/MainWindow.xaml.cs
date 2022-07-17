@@ -34,7 +34,13 @@ public partial class MainWindow : Window
     private async Task LoadTaskList()
     {
         _taskList = await _repo.GetTaskList();
-        _currentTaskListSection = _taskList.Sections.First();
+        SectionsComboBox.Items.Clear();
+        _taskList.Sections.ForEach(x => SectionsComboBox.Items.Add(x.Title));
+
+        var firstSection = _taskList.Sections.First();
+        SectionsComboBox.SelectedItem = firstSection.Title;
+        _currentTaskListSection = firstSection;
+
         await NextIncompleteTask();
     }
 
