@@ -13,6 +13,7 @@
         Topmost="True" 
         WindowStyle="None"
         AllowsTransparency="True"
+        ResizeMode="CanResizeWithGrip"
         Loaded="Window_Loaded" 
         MouseDown="Window_MouseDown">
     <Grid>
