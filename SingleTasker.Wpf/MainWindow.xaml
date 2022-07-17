@@ -5,7 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SingleTasker.Wpf"
         mc:Ignorable="d"
-        Title="SingleTasker" Height="240" Width="300" Loaded="Window_Loaded" Topmost="True" WindowStyle="None" MouseDown="Window_MouseDown">
+        Title="SingleTasker" 
+        Height="240" 
+        Width="300" 
+        MinHeight="135"
+        MinWidth="180"
+        Topmost="True" 
+        WindowStyle="None" 
+        Loaded="Window_Loaded" 
+        MouseDown="Window_MouseDown">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -16,7 +24,7 @@
                 <RowDefinition Height="40"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
-            <ComboBox Name="SectionsComboBox" Height="24" Margin="10,0,10,0"></ComboBox>
+            <ComboBox Name="SectionsComboBox" Height="24" Margin="10,0,10,0" DropDownClosed="SectionsComboBox_DropDownClosed"></ComboBox>
             <CheckBox Name="TaskCompleteCheckbox" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="1" VerticalAlignment="Center" Click="TaskCompleteCheckbox_Click" RenderTransformOrigin="0.5,0.5">
                 <CheckBox.RenderTransform>
                     <TransformGroup>

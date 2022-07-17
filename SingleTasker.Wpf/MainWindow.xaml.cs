@@ -15,6 +15,7 @@ public partial class MainWindow : Window
 {
     private readonly SingleTaskRepository _repo;
     private int _currentTaskIndex;
+    private int _currentSectionIndex;
     private SingleTaskList _taskList;
     private SingleTaskListSection _currentTaskListSection;
     private SingleTask _currentTask;
@@ -28,18 +29,26 @@ public partial class MainWindow : Window
 
     private async void TaskListChanged(object sender, FileSystemEventArgs e)
     {
-        await Dispatcher.InvokeAsync(LoadTaskList);
+        await Dispatcher.InvokeAsync(() => LoadTaskList(_currentSectionIndex));
     }
 
-    private async Task LoadTaskList()
+    private async Task LoadTaskList(int selectedSectionIndex = -1)
     {
         _taskList = await _repo.GetTaskList();
         SectionsComboBox.Items.Clear();
         _taskList.Sections.ForEach(x => SectionsComboBox.Items.Add(x.Title));
 
-        var firstSection = _taskList.Sections.First();
-        SectionsComboBox.SelectedItem = firstSection.Title;
-        _currentTaskListSection = firstSection;
+        if (selectedSectionIndex == -1)
+        {
+            var firstSection = _taskList.Sections.First();
+            SectionsComboBox.SelectedItem = firstSection.Title;
+            _currentTaskListSection = firstSection;
+        }
+        else
+        {
+            SectionsComboBox.SelectedIndex = selectedSectionIndex;
+            _currentTaskListSection = _taskList.Sections[selectedSectionIndex];
+        }
 
         await NextIncompleteTask();
     }
@@ -145,5 +154,17 @@ public partial class MainWindow : Window
     private void MinimizeButton_Click(object sender, RoutedEventArgs e)
     {
         WindowState = WindowState.Minimized;
+    }
+
+    private async void SectionsComboBox_DropDownClosed(object sender, EventArgs e)
+    {
+        if (SectionsComboBox.SelectedIndex == -1)
+        {
+            return;
+        }
+
+        _currentSectionIndex = SectionsComboBox.SelectedIndex;
+        _currentTaskListSection = _taskList.Sections[_currentSectionIndex];
+        await NextIncompleteTask();
     }
 }
