@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using SingleTasker.Wpf.Common;
 
 /// <summary>
@@ -120,5 +121,13 @@ public partial class MainWindow : Window
         await _repo.Initialize();
         _repo.Watcher.Changed += TaskListChanged;
         await LoadTaskList();
+    }
+
+    private void Window_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton == MouseButton.Left)
+        {
+            DragMove();
+        }
     }
 }
