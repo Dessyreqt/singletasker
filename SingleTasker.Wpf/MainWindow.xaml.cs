@@ -14,7 +14,8 @@ using SingleTasker.Wpf.Configuration;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private readonly SingleTaskRepository _repo;
+    private ConfigurationRepository _config;
+    private SingleTaskRepository _repo;
     private int _currentTaskIndex;
     private int _currentSectionIndex;
     private SingleTaskList _taskList;
@@ -24,8 +25,6 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        var storagePath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "SingleTasker", "tasks.md");
-        _repo = new SingleTaskRepository(storagePath);
     }
 
     private async void TaskListChanged(object sender, FileSystemEventArgs e)
@@ -141,7 +140,14 @@ public partial class MainWindow : Window
 
     private async void Window_Loaded(object sender, RoutedEventArgs e)
     {
+        var configPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "SingleTasker", "config.json");
+        _config = new ConfigurationRepository(configPath);
+        await _config.Initialize();
+
+        var storagePath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "SingleTasker", "tasks.md");
+        _repo = new SingleTaskRepository(storagePath);
         await _repo.Initialize();
+
         _repo.Watcher.Changed += TaskListChanged;
         await LoadTaskList();
     }
@@ -178,7 +184,7 @@ public partial class MainWindow : Window
 
     private void ConfigButton_Click(object sender, RoutedEventArgs e)
     {
-        var configWindow = new ConfigurationWindow();
+        var configWindow = new ConfigurationWindow(_config);
         configWindow.ShowDialog();
     }
 }

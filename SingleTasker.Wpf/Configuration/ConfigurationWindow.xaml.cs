@@ -7,8 +7,16 @@ using System.Windows;
 /// </summary>
 public partial class ConfigurationWindow : Window
 {
-    public ConfigurationWindow()
+    private readonly ConfigurationRepository _config;
+
+    public ConfigurationWindow(ConfigurationRepository config)
     {
+        _config = config;
         InitializeComponent();
+    }
+
+    private void OpenConfigButton_Click(object sender, RoutedEventArgs e)
+    {
+        _config.OpenFile();
     }
 }

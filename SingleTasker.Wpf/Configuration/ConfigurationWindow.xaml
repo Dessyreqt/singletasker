@@ -7,8 +7,8 @@
         mc:Ignorable="d"
         Title="Configuration" Height="148" Width="308" Topmost="True" ResizeMode="CanMinimize">
     <Grid>
-        <Button Content="Open config file" Margin="10,10,10,0" VerticalAlignment="Top"/>
-        <Button Content="Reload config" Margin="10,35,10,0" VerticalAlignment="Top"/>
+        <Button Name="OpenConfigButton" Content="Open config file" Margin="10,10,10,0" VerticalAlignment="Top" Click="OpenConfigButton_Click"/>
+        <Button Name="ReloadConfigButton" Content="Reload config" Margin="10,35,10,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>
