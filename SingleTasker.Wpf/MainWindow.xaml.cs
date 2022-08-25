@@ -6,7 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using SingleTasker.Wpf.Common;
+using SingleTasker.Common;
+using SingleTasker.Wpf.Configuration;
 
 /// <summary>
 /// Interaction logic for MainWindow.xaml
@@ -173,5 +174,11 @@ public partial class MainWindow : Window
         _currentSectionIndex = SectionsComboBox.SelectedIndex;
         _currentTaskListSection = _taskList.Sections[_currentSectionIndex];
         await NextIncompleteTask();
+    }
+
+    private void ConfigButton_Click(object sender, RoutedEventArgs e)
+    {
+        var configWindow = new ConfigurationWindow();
+        configWindow.ShowDialog();
     }
 }

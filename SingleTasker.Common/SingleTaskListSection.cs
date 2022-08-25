@@ -1,4 +1,4 @@
-﻿namespace SingleTasker.Wpf.Common;
+﻿namespace SingleTasker.Common;
 
 using System.Text;
 

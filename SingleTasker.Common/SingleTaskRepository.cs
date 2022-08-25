@@ -1,4 +1,4 @@
-﻿namespace SingleTasker.Wpf.Common;
+﻿namespace SingleTasker.Common;
 
 using System.Diagnostics;
 
@@ -21,14 +21,8 @@ public class SingleTaskRepository
         var filename = Path.GetFileName(_path);
 
         Watcher = new FileSystemWatcher(_directory);
-        Watcher.NotifyFilter = NotifyFilters.Attributes
-                               | NotifyFilters.CreationTime
-                               | NotifyFilters.DirectoryName
-                               | NotifyFilters.FileName
-                               | NotifyFilters.LastAccess
-                               | NotifyFilters.LastWrite
-                               | NotifyFilters.Security
-                               | NotifyFilters.Size;
+        Watcher.NotifyFilter = NotifyFilters.Attributes | NotifyFilters.CreationTime | NotifyFilters.DirectoryName | NotifyFilters.FileName | NotifyFilters.LastAccess |
+                               NotifyFilters.LastWrite | NotifyFilters.Security | NotifyFilters.Size;
         Watcher.Filter = filename;
         Watcher.IncludeSubdirectories = false;
         Watcher.EnableRaisingEvents = true;
