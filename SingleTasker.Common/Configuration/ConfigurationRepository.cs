@@ -54,7 +54,8 @@ public class ConfigurationRepository
             return;
         }
 
-        await using var writer = new StreamWriter(_path, false);
-        await writer.WriteAsync(@"{}");
+        await using var writer = new StreamWriter(_path);
+        var writeConfiguration = JsonConvert.SerializeObject(new AppConfiguration(), SerializationSettings.Configuration);
+        await writer.WriteAsync(writeConfiguration);
     }
 }

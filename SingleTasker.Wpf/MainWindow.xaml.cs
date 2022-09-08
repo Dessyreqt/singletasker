@@ -15,7 +15,7 @@ using SingleTasker.Wpf.Configuration;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private ConfigurationRepository _config;
+    private ConfigurationRepository _configRepo;
     private SingleTaskRepository _repo;
     private int _currentTaskIndex;
     private int _currentSectionIndex;
@@ -142,11 +142,11 @@ public partial class MainWindow : Window
     private async void Window_Loaded(object sender, RoutedEventArgs e)
     {
         var configPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "SingleTasker", "config.json");
-        _config = new ConfigurationRepository(configPath);
-        await _config.Initialize();
+        _configRepo = new ConfigurationRepository(configPath);
+        await _configRepo.Initialize();
 
-        var storagePath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "SingleTasker", "tasks.md");
-        _repo = new SingleTaskRepository(storagePath);
+        var config = await _configRepo.GetConfiguration();
+        _repo = new SingleTaskRepository(config.TaskListPath);
         await _repo.Initialize();
 
         _repo.Watcher.Changed += TaskListChanged;
@@ -185,7 +185,7 @@ public partial class MainWindow : Window
 
     private void ConfigButton_Click(object sender, RoutedEventArgs e)
     {
-        var configWindow = new ConfigurationWindow(_config);
+        var configWindow = new ConfigurationWindow(_configRepo);
         configWindow.ShowDialog();
     }
 }
