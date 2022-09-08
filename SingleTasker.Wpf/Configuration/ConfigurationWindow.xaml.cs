@@ -1,6 +1,7 @@
 ﻿namespace SingleTasker.Wpf.Configuration;
 
 using System.Windows;
+using SingleTasker.Common.Configuration;
 
 /// <summary>
 /// Interaction logic for ConfigurationWindow.xaml

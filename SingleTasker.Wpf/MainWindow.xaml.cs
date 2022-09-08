@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using SingleTasker.Common;
+using SingleTasker.Common.Configuration;
 using SingleTasker.Wpf.Configuration;
 
 /// <summary>

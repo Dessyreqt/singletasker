@@ -1,7 +1,4 @@
-﻿namespace SingleTasker.Wpf.Configuration;
-
-using System;
-using System.IO;
+﻿namespace SingleTasker.Common.Configuration;
 
 public class AppConfiguration
 {

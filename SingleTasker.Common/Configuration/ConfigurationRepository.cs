@@ -1,8 +1,7 @@
-﻿namespace SingleTasker.Wpf.Configuration;
+﻿namespace SingleTasker.Common.Configuration;
 
 using System.Diagnostics;
-using System.IO;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 public class ConfigurationRepository
 {
@@ -22,6 +21,23 @@ public class ConfigurationRepository
     {
         var startInfo = new ProcessStartInfo { FileName = _path, UseShellExecute = true };
         Process.Start(startInfo);
+    }
+
+    public async Task<AppConfiguration> GetConfiguration()
+    {
+        await CreatePathIfNeeded();
+        using var reader = new StreamReader(_path);
+        var readConfiguration = await reader.ReadToEndAsync();
+
+        return JsonConvert.DeserializeObject<AppConfiguration>(readConfiguration, SerializationSettings.Configuration) ?? new AppConfiguration();
+    }
+
+    public async Task SaveConfiguration(AppConfiguration config)
+    {
+        await CreatePathIfNeeded();
+        await using var writer = new StreamWriter(_path);
+        var writeConfiguration = JsonConvert.SerializeObject(config, SerializationSettings.Configuration);
+        await writer.WriteAsync(writeConfiguration);
     }
 
     private async Task CreatePathIfNeeded()
