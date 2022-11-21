@@ -16,7 +16,7 @@
         ResizeMode="CanResizeWithGrip"
         Loaded="Window_Loaded" 
         MouseDown="Window_MouseDown" BorderBrush="{DynamicResource Border}" BorderThickness="1,1,1,1" Foreground="{DynamicResource Text}" Background="{DynamicResource WindowBackground}"
-    xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2">
+    xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" SizeChanged="Window_SizeChanged" LocationChanged="Window_LocationChanged">
     <Window.Resources>
         <SolidColorBrush x:Key="WindowBackground" Color="#FF3C3C3C"/>
         <SolidColorBrush x:Key="Text" Color="#FFBFBFBF"/>

@@ -1,5 +1,6 @@
 ﻿namespace SingleTasker.Common.Configuration;
 
+using System.ComponentModel;
 using System.Diagnostics;
 using Newtonsoft.Json;
 
@@ -19,8 +20,13 @@ public class ConfigurationRepository
 
     public void OpenFile()
     {
-        var startInfo = new ProcessStartInfo { FileName = _path, UseShellExecute = true };
-        Process.Start(startInfo);
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = _path,
+            UseShellExecute = true
+        };
+        try { Process.Start(startInfo); }
+        catch (Win32Exception ex) { }
     }
 
     public async Task<AppConfiguration> GetConfiguration()
@@ -44,15 +50,9 @@ public class ConfigurationRepository
     {
         var directory = Path.GetDirectoryName(_path);
 
-        if (!Directory.Exists(directory))
-        {
-            Directory.CreateDirectory(directory);
-        }
+        if (!Directory.Exists(directory)) { Directory.CreateDirectory(directory); }
 
-        if (File.Exists(_path))
-        {
-            return;
-        }
+        if (File.Exists(_path)) { return; }
 
         await using var writer = new StreamWriter(_path);
         var writeConfiguration = JsonConvert.SerializeObject(new AppConfiguration(), SerializationSettings.Configuration);

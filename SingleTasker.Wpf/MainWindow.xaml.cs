@@ -22,6 +22,7 @@ public partial class MainWindow : Window
     private SingleTaskList _taskList;
     private SingleTaskListSection _currentTaskListSection;
     private SingleTask _currentTask;
+    private bool _loaded;
 
     public MainWindow()
     {
@@ -37,10 +38,7 @@ public partial class MainWindow : Window
     {
         var readTaskList = await _repo.GetTaskList(_taskList);
 
-        if (readTaskList == null)
-        {
-            return;
-        }
+        if (readTaskList == null) { return; }
 
         _taskList = readTaskList ?? _taskList;
         SectionsComboBox.Items.Clear();
@@ -76,10 +74,7 @@ public partial class MainWindow : Window
             await _repo.SaveTaskList(_taskList);
         }
 
-        if (_currentTaskIndex == -1)
-        {
-            _currentTaskIndex = _currentTaskListSection.GetFirstIncompleteTask();
-        }
+        if (_currentTaskIndex == -1) { _currentTaskIndex = _currentTaskListSection.GetFirstIncompleteTask(); }
 
         _currentTask = _currentTaskListSection.Items[_currentTaskIndex];
     }
@@ -96,10 +91,7 @@ public partial class MainWindow : Window
 
     private async Task PreviousTask()
     {
-        if (_currentTaskIndex > 0)
-        {
-            _currentTaskIndex--;
-        }
+        if (_currentTaskIndex > 0) { _currentTaskIndex--; }
 
         await SetCurrentTask();
         DisplayCurrentTask();
@@ -107,10 +99,7 @@ public partial class MainWindow : Window
 
     private async Task NextTask()
     {
-        if (_currentTaskIndex < _currentTaskListSection.Items.Count - 1)
-        {
-            _currentTaskIndex++;
-        }
+        if (_currentTaskIndex < _currentTaskListSection.Items.Count - 1) { _currentTaskIndex++; }
 
         await SetCurrentTask();
         DisplayCurrentTask();
@@ -133,10 +122,7 @@ public partial class MainWindow : Window
         _currentTask.Complete = TaskCompleteCheckbox.IsChecked ?? false;
         await _repo.SaveTaskList(_taskList);
 
-        if (_currentTask.Complete)
-        {
-            await NextTask();
-        }
+        if (_currentTask.Complete) { await NextTask(); }
     }
 
     private async void Window_Loaded(object sender, RoutedEventArgs e)
@@ -149,16 +135,20 @@ public partial class MainWindow : Window
         _repo = new SingleTaskRepository(config.TaskListPath);
         await _repo.Initialize();
 
+        Top = config.Top ?? Top;
+        Left = config.Left ?? Left;
+        Height = config.Height ?? Height;
+        Width = config.Width ?? Width;
+
         _repo.Watcher.Changed += TaskListChanged;
         await LoadTaskList();
+
+        _loaded = true;
     }
 
     private void Window_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        if (e.ChangedButton == MouseButton.Left)
-        {
-            DragMove();
-        }
+        if (e.ChangedButton == MouseButton.Left) { DragMove(); }
     }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)
@@ -173,10 +163,7 @@ public partial class MainWindow : Window
 
     private async void SectionsComboBox_DropDownClosed(object sender, EventArgs e)
     {
-        if (SectionsComboBox.SelectedIndex == -1)
-        {
-            return;
-        }
+        if (SectionsComboBox.SelectedIndex == -1) { return; }
 
         _currentSectionIndex = SectionsComboBox.SelectedIndex;
         _currentTaskListSection = _taskList.Sections[_currentSectionIndex];
@@ -187,5 +174,47 @@ public partial class MainWindow : Window
     {
         var configWindow = new ConfigurationWindow(_configRepo);
         configWindow.ShowDialog();
+    }
+
+    private async void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (!_loaded) { return; }
+
+        var newWidth = Width;
+        var newHeight = Height;
+
+        await Task.Delay(1000);
+
+        if (newWidth != Width || newHeight != Height) { return; }
+
+        await SaveSizeAndPosition();
+    }
+
+    private async Task SaveSizeAndPosition()
+    {
+        if (_configRepo is null) { return; }
+
+        var config = await _configRepo.GetConfiguration();
+
+        config.Top = Top;
+        config.Left = Left;
+        config.Width = Width;
+        config.Height = Height;
+
+        await _configRepo.SaveConfiguration(config);
+    }
+
+    private async void Window_LocationChanged(object sender, EventArgs e)
+    {
+        if (!_loaded) { return; }
+
+        var newTop = Top;
+        var newLeft = Left;
+
+        await Task.Delay(1000);
+
+        if (newTop != Top || newLeft != Left) { return; }
+
+        await SaveSizeAndPosition();
     }
 }
