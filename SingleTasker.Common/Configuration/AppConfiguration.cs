@@ -7,4 +7,5 @@ public class AppConfiguration
     public double? Width { get; set; } = null;
     public double? Top { get; set; } = null;
     public double? Left { get; set; } = null;
+    public string? SelectedTaskList { get; set; } = null;
 }
